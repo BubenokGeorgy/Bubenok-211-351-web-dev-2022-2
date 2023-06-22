@@ -125,6 +125,7 @@ def update_book(book_id):
     book = getBook(book_id=book_id)
     allgenres, edited_genres = getGenres(book_id=book_id)
     cur_params = getParams(PERMITTED_PARAMS)
+    new_genres = request.form.getlist('genre_id')
     for param in cur_params:
         if cur_params[param]==None:
             flash("Указаны не все параметры", "danger")
@@ -138,6 +139,19 @@ def update_book(book_id):
         with db.connection.cursor(named_tuple = True) as cursor:
                     cursor.execute(query,(cur_params['title'],cur_params['short_desc'],cur_params['author'],cur_params['year'],cur_params['size'],cur_params['publisher'],book_id)) 
                     db.connection.commit()
+        query = """
+                DELETE FROM book_has_genres WHERE book_id = %s;
+                """
+        with db.connection.cursor(named_tuple = True) as cursor:
+                    cursor.execute(query,(book_id,)) 
+                    db.connection.commit()
+        for genre in new_genres:
+            query = """
+                INSERT INTO book_has_genres (book_id, genres_id) VALUES (%s, %s);
+                """
+            with db.connection.cursor(named_tuple = True) as cursor:
+                    cursor.execute(query,(book_id,genre)) 
+                    db.connection.commit()    
         flash(f"Книга '{cur_params['title']}' успешно обновлена", "success")
     except:
         flash("При сохранении возникла ошибка", "danger")
