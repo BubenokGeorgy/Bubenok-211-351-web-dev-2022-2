@@ -56,10 +56,10 @@
             </td>
             <td>
                 <div class="btn-group" role="group">
-                    <a class="btn btn-secondary" href="{{ url_for('show_user', user_id=user.id)}}">Просмотр</a>
+                    <a class="btn btn-success" href="{{ url_for('show_user', user_id=user.id)}}">Просмотр</a>
                     {% if current_user.is_authenticated %}
-                    <a class="btn btn-primary" href="{{ url_for('edit_user', user_id=user.id)}}">Редактировать</a>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-url="{{ url_for('delete_user', user_id=user.id)}}" data-login="{{user.login}}"> Удалить </button>
+                    <a class="btn btn-info" href="{{ url_for('edit_user', user_id=user.id)}}">Редактирование</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-url="{{ url_for('delete_user', user_id=user.id)}}" data-login="{{user.login}}"> Удаление </button>
                     {% endif %}
                 </div>
             </td>
@@ -69,7 +69,10 @@
     </tbody>
 </table>
 {% if current_user.is_authenticated %}
-<a class="btn btn-primary" href="{{ url_for('new_user') }}">Добавить пользователя</a>
+<div class="d-flex justify-content-center">
+    <a class="btn btn-warning" href="{{ url_for('new_user') }}">Добавить пользователя</a>
+</div>
+
 {% endif %}
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

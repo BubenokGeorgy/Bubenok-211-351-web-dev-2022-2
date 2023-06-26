@@ -58,13 +58,13 @@
                 <div class="btn-group" role="group">
                     {% if current_user.is_authenticated %} 
                         {% if current_user.can("show", user) %}
-                            <a class="btn btn-secondary" href="{{ url_for('show_user', user_id=user.id)}}">Просмотр</a>
+                            <a class="btn btn-success" href="{{ url_for('show_user', user_id=user.id)}}">Просмотр</a>
                         {% endif %}
                         {% if current_user.can("edit", user) %}
-                            <a class="btn btn-primary" href="{{ url_for('edit_user', user_id=user.id)}}">Редактировать</a>
+                            <a class="btn btn-info" href="{{ url_for('edit_user', user_id=user.id)}}">Редактирование</a>
                         {% endif %}
                         {% if current_user.can("delete", user) %}
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-url="{{ url_for('delete_user', user_id=user.id)}}" data-login="{{user.login}}"> Удалить </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-url="{{ url_for('delete_user', user_id=user.id)}}" data-login="{{user.login}}"> Удаление </button>
                         {% endif %}
                     {% endif %}
                 </div>
@@ -75,7 +75,9 @@
     </tbody>
 </table>
 {% if current_user.is_authenticated and current_user.can("create") %}
-<a class="btn btn-primary" href="{{ url_for('new_user') }}">Добавить пользователя</a>
+<div class="d-flex justify-content-center">
+    <a class="btn btn-warning" href="{{ url_for('new_user') }}">Добавить пользователя</a>
+</div>
 {% endif %}
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

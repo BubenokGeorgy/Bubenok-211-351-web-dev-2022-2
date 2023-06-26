@@ -78,9 +78,9 @@
       {% endif %}
     </div>
   </div>
-  <div class="row mb-3">
+  <div class="column mb-3">
     <label for="inputMiddleName" class="col-sm-2 col-form-label">Отчество</label>
-    <div class="col-sm-10">
+    <div class="">
       <input type="text" class="form-control" id="inputMiddleName" name="middle_name"
         value="{{ user.middle_name or '' }}">
     </div>
@@ -97,8 +97,10 @@
       </select>
     </div>
   </div>
-
-  <button type="submit" class="btn btn-primary">Сохранить
-  </button>
+  <div class="d-flex justify-content-center">
+    <button type="submit" class="btn btn-info">Сохранить
+    </button>
+  </div>
+ 
 </form>
 {% endmacro %}

@@ -4,7 +4,6 @@
 {% if current_user.is_authenticated %}
     Ваш логин: {{ current_user.login }}!
 {% else %}
-    Не авторизированный пользователь
+    Неавторизированный пользователь
 {% endif %}
-{{ current_user.is_anonymous }}
 {% endblock %}

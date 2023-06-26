@@ -7,7 +7,7 @@ import mysql.connector
 app = Flask(__name__)
 application = app
 
-PERMITTED_PARAMS = ["login", "password", "last_name", "first_name", "middle_name", "role_id"]
+PERMITTED_getParams = ["login", "password", "last_name", "first_name", "middle_name", "role_id"]
 
 app.config.from_pyfile('config.py')
 db = MySQL(app)
@@ -30,11 +30,8 @@ def index():
 
 def authentificate_user(login, password):
     query = "SELECT * FROM users WHERE login = %s AND password_hash	= SHA2(%s, 256);"
-    # query = f"SELECT * FROM users WHERE login = '{login}' AND password_hash = SHA2('{password}', 256);"
-    #  user' OR 0=0#  password
     with db.connection.cursor(named_tuple = True) as cursor:
         cursor.execute(query, (login, password))
-        # cursor.execute(query)
         print(cursor.statement)
         db_user = cursor.fetchone()
     if db_user is not None:
@@ -98,14 +95,14 @@ def load_roles():
 def new_user():
     return render_template('users/new.html', roles = load_roles(), user={}, errors={})
 
-def insert_to_db(params):
+def insert_to_db(getParams):
     query = """
         INSERT INTO users (login, password_hash, last_name, first_name, middle_name, role_id) 
         VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s, %(role_id)s);
     """
     try:
         with db.connection.cursor(named_tuple = True) as cursor:
-            cursor.execute(query, params)
+            cursor.execute(query, getParams)
             db.connection.commit()
     except mysql.connector.errors.DatabaseError:
         db.connection.rollback()
@@ -113,7 +110,7 @@ def insert_to_db(params):
 
     return True
 
-def validation_edit(params):
+def validation_edit(getParams):
     PERMITTED_LOGIN = "abcdefghijklmnopqrstuvwxyz1234567890"
     errors_res = {
         "login": None,
@@ -121,8 +118,7 @@ def validation_edit(params):
         "first_name": None,
         "isvalidate": 1,
     }
-    #Check login
-    login = params.get("login")
+    login = getParams.get("login")
     if login is None:
         errors_res["login"] = TYPES_ERRORS["empty_login"]
         errors_res["isvalidate"] = 0
@@ -136,26 +132,24 @@ def validation_edit(params):
                  errors_res["isvalidate"] = 0
                  break
              
-    #Check last_name
-    if params.get("last_name") is None:
+    if getParams.get("last_name") is None:
         errors_res["last_name"] = TYPES_ERRORS["empty_last_name"]
         errors_res["isvalidate"] = 0
 
-    #Check first_name
-    if params.get("first_name") is None:
+    if getParams.get("first_name") is None:
         errors_res["first_name"] = TYPES_ERRORS["empty_first_name"]
         errors_res["isvalidate"] = 0
 
     return errors_res
 
-def check_password(params, PERMITTED_PASSWORD):
+def check_password(getParams, PERMITTED_PASSWORD):
     errors_res = {
         "password": None,
     }
     count_upper_letters = 0
     count_lower_letters = 0
     count_digits = 0
-    password = params.get("password")
+    password = getParams.get("password")
     if password is None:
         errors_res["password"] = TYPES_ERRORS["empty_passwd"]
     elif len(password) < 8:
@@ -184,7 +178,7 @@ def check_password(params, PERMITTED_PASSWORD):
             errors_res["password"] = TYPES_ERRORS["password_hasnt_digit"]
     return errors_res
 
-def validation_create(params):
+def validation_create(getParams):
     PERMITTED_LOGIN = "abcdefghijklmnopqrstuvwxyz1234567890"
     PERMITTED_PASSWORD = '''abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя1234567890~!?@#$%^&*_-+()[]{}></\|"'.,:;'''
     errors_res = {
@@ -194,8 +188,7 @@ def validation_create(params):
         "first_name": None,
         "isvalidate": 1,
     }
-    #Check login
-    login = params.get("login")
+    login = getParams.get("login")
     if login is None:
         errors_res["login"] = TYPES_ERRORS["empty_login"]
         errors_res["isvalidate"] = 0
@@ -209,25 +202,22 @@ def validation_create(params):
                  errors_res["isvalidate"] = 0
                  break
              
-    #Check last_name
-    if params.get("last_name") is None:
+    if getParams.get("last_name") is None:
         errors_res["last_name"] = TYPES_ERRORS["empty_last_name"]
         errors_res["isvalidate"] = 0
 
-    #Check first_name
-    if params.get("first_name") is None:
+    if getParams.get("first_name") is None:
         errors_res["first_name"] = TYPES_ERRORS["empty_first_name"]
         errors_res["isvalidate"] = 0
 
-    #Check password
-    checked_password = check_password(params, PERMITTED_PASSWORD)
+    checked_password = check_password(getParams, PERMITTED_PASSWORD)
     if not checked_password.get("password") is None:
         errors_res["password"] = checked_password["password"]
         errors_res["isvalidate"] = 0
 
     return errors_res
             
-def params(names_list):
+def getParams(names_list):
     result = {}
     for name in names_list:
         result[name] = request.form.get(name) or None
@@ -236,19 +226,19 @@ def params(names_list):
 @app.route('/users/create', methods=['POST'])
 @login_required
 def create_user():
-    cur_params = params(PERMITTED_PARAMS)
-    errors = validation_create(cur_params)
+    cur_getParams = getParams(PERMITTED_getParams)
+    errors = validation_create(cur_getParams)
     if errors["isvalidate"] == 0:
         flash("Проверьте правильность введённых данных", "danger")
-        return render_template("users/new.html", roles = load_roles(), user=cur_params, errors=errors)
+        return render_template("users/new.html", roles = load_roles(), user=cur_getParams, errors=errors)
     
-    inserted = insert_to_db(cur_params)
+    inserted = insert_to_db(cur_getParams)
     if inserted:
         flash("Пользователь успешно добавлен", "success")
         return redirect(url_for("users"))
     else:
         flash("При сохранении возникла ошибка", "danger")
-        return render_template("users/new.html", roles = load_roles(), user=cur_params, errors=errors)
+        return render_template("users/new.html", roles = load_roles(), user=cur_getParams, errors=errors)
 
 @app.route('/users/<int:user_id>/edit', methods=['GET'])
 @login_required
@@ -267,9 +257,9 @@ def edit_user(user_id):
 @app.route('/users/<int:user_id>/update', methods=['POST'])
 @login_required
 def update_user(user_id):
-    cur_params = params(PERMITTED_PARAMS)
-    errors = validation_edit(cur_params)
-    cur_params["id"] = user_id
+    cur_getParams = getParams(PERMITTED_getParams)
+    errors = validation_edit(cur_getParams)
+    cur_getParams["id"] = user_id
     update_query = """
     UPDATE users SET login = %(login)s, last_name = %(last_name)s, 
     first_name = %(first_name)s, middle_name = %(middle_name)s,
@@ -277,16 +267,16 @@ def update_user(user_id):
     """
     if errors["isvalidate"] == 0:
         flash("Проверьте правильность введённых данных", "danger")
-        return render_template('users/edit.html', user=cur_params, roles=load_roles(), errors=errors)
+        return render_template('users/edit.html', user=cur_getParams, roles=load_roles(), errors=errors)
     try:
         with db.connection.cursor(named_tuple = True) as cursor:
-            cursor.execute(update_query, cur_params)
+            cursor.execute(update_query, cur_getParams)
             db.connection.commit()
             flash("Пользователь успешно обновлен", "success")
     except mysql.connector.errors.DatabaseError:
         flash("При изменении возникла ошибка", "danger")
         db.connection.rollback()
-        return render_template('users/edit.html', user=cur_params, roles=load_roles(), errors=errors)
+        return render_template('users/edit.html', user=cur_getParams, roles=load_roles(), errors=errors)
         
     return redirect(url_for("users"))
     
@@ -343,7 +333,6 @@ def update_password():
         query = "SELECT * FROM users WHERE id = %s AND password_hash = SHA2(%s, 256);"
         with db.connection.cursor(named_tuple = True) as cursor:
             cursor.execute(query, (user_id, old_passwd))
-            # cursor.execute(query)
             print(cursor.statement)
             db_user = cursor.fetchone()
             if db_user is None:
