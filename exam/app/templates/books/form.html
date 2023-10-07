@@ -1,4 +1,6 @@
 {% macro book_form(genres, url, current_user, new_genres, book = {}) %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
 <form enctype="multipart/form-data" action="{{url}}" method="post">
   <div class="row mb-3">
     <label for="inputName" class="col-sm-2 col-form-label"><b>Название</b></label>
@@ -6,18 +8,18 @@
       <input type="text" class="form-control" id="inputName" name="title" value="{{ book.title or '' }}">
     </div>
   </div>
-  {% if request.endpoint == "new_book" or request.endpoint == "create_book" %}
-  <div class="col-md-6 d-flex flex-column">
-    <div class="mb-3">
-      <label for="cover_img">Обложка</label>
-      <input class="form-control" type="file" name="cover_img" id="cover_img">
+  {% if request.endpoint == "add" or request.endpoint == "create_book" %}
+    <div class="row mb-3">
+      <label for="cover_img" class="col-sm-2 col-form-label"><b>Обложка</b></label>
+      <div class="col-sm-10">
+        <input class="form-control" type="file" name="cover_img" id="cover_img">
+      </div>
     </div>
-  </div>
   {% endif %}
   <div class="row mb-3">
     <label for="inputDesc" class="col-sm-2 col-form-label"><b>Описание</b></label>
     <div class="col-sm-10">
-      <textarea type="text" class="form-control" id="inputDesc" name="short_desc"
+      <textarea type="text" class="form-control" id="markdown-editor" name="description"
         value="{{ book.description or '' }}">{{ book.description or '' }}</textarea>
     </div>
   </div>
@@ -62,5 +64,10 @@
     <button type="submit" class="btn btn-info">Сохранить</button>
   <div class="text-center"></div>
 </form>
-<script src="{{ url_for('static', filename='easyMDE.js')}}"></script>
+<script>
+  var easyMDE = new EasyMDE({
+      element: document.getElementById("markdown-editor"),
+      spellChecker: false,
+  });
+</script>
 {% endmacro %}

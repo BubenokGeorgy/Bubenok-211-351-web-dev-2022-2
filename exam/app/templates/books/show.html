@@ -16,7 +16,7 @@
                 <div><b>Жанр(ы):</b> {{book.genres}}<br></div>
                 <div>
                     <div><b>Краткое описание:</b><br></div>
-                    <div>{{book.description}}</div>
+                    <div>{{book.description|safe}}</div>
                 </div>
                 <div><b>Первая публикация:</b> {{book.year}}</div>
                 {% if book.avg_review_grade!=None%}
@@ -40,7 +40,7 @@
                 <div class="flex-shrink-0 py-2 px-2 border border-1 border-success">
                     <img src="{{ url_for('static', filename='images/profile.jpg') }}" width="30" height="30" alt="Sample Image">
                     <b>{{current_user.getFullName()}}</b>({{your_review.grade}}<i class="bi bi-star-fill" aria-hidden="true"></i>)</img>
-                    <br><div class="py-2">{{your_review.text}}</div>      
+                    <br><div class="py-2">{{your_review.text|safe}}</div>      
                 </div>
                 </h5>
             </div>
@@ -61,7 +61,7 @@
         <div class="flex-shrink-0 py-2 px-2 border border-1 border-success">
             <img src="{{ url_for('static', filename='images/profile.jpg') }}" width="30" height="30" alt="Sample Image">
             <b>{{review.full_name}}</b>({{review.grade}}<i class="bi bi-star-fill" aria-hidden="true"></i>)</img>
-            <br><div class="py-2">{{review.text}}</div>      
+            <br><div class="py-2">{{review.text|safe}}</div>      
         </div>
         </h5>
         {%endfor %}
